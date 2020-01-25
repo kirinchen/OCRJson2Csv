@@ -1,6 +1,7 @@
 package com.kirin.demo;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -24,7 +25,7 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
 	@Override
 	public void onApplicationEvent(final ApplicationReadyEvent event) {
 
-		File file = new File("C:\\Users\\DDT\\Desktop\\JayOCR\\data\\1.json");
+		File file = new File("C:\\Users\\DDT\\Desktop\\JayOCR\\OCRJson2Csv\\data\\1.json");
 
 		try {
 			Map car = obm.readValue(file, Map.class);
@@ -35,7 +36,7 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
 
 	}
 
-	private void procces(Map m) throws JsonProcessingException {
+	private void procces(Map m) throws IOException {
 
 		Map cm = (Map) m.get("data");
 		String checkJson = obm.writeValueAsString(cm.get("block_array"));
@@ -48,7 +49,14 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
 		System.out.println(tileList.size()+":"+tileList);
 		if(tileList.size()>1) throw new RuntimeException("Size > 1");
 		TileList tl = tileList.get(0);
+		tl.init();
+		System.out.println(tl.get1Block());
+		BlockMap bm1 = tl.get1Block();
+		BlockMap bm2 = tl.get2Block();
 		
+		System.out.println("bm2:"+obm.writeValueAsString(bm2)); 
+		
+		bm2.saveCSV();
 
 	}
 
