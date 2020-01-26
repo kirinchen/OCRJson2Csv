@@ -25,8 +25,10 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
 	@Override
 	public void onApplicationEvent(final ApplicationReadyEvent event) {
 
-		File file = new File("C:\\Users\\DDT\\Desktop\\JayOCR\\OCRJson2Csv\\data\\1.json");
+		File file = new File("input.json");
 
+		System.out.println("Read File:"+file.getAbsolutePath());
+		
 		try {
 			Map car = obm.readValue(file, Map.class);
 			procces(car);
@@ -42,21 +44,26 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
 		String checkJson = obm.writeValueAsString(cm.get("block_array"));
 		System.out.println(checkJson);
 		List<Object> tls = obm.readValue(checkJson, List.class);
-		List<TileList> tileList = tls.stream()
-				.map(conv).filter(l -> l.size() > 0)
-				.filter(l -> l.isGrided())
+		List<TileList> tileList = tls.stream().map(conv).filter(l -> l.size() > 0).filter(l -> l.isGrided())
 				.collect(Collectors.toList());
-		System.out.println(tileList.size()+":"+tileList);
-		if(tileList.size()>1) throw new RuntimeException("Size > 1");
+		System.out.println(tileList.size() + ":" + tileList);
+		if (tileList.size() > 1)
+			throw new RuntimeException("Size > 1");
 		TileList tl = tileList.get(0);
 		tl.init();
-		System.out.println(tl.get1Block());
 		BlockMap bm1 = tl.get1Block();
 		BlockMap bm2 = tl.get2Block();
-		
-		System.out.println("bm2:"+obm.writeValueAsString(bm2)); 
-		
-		bm2.saveCSV();
+		RC apRc = bm2.getKeyByValue("030925-DKLV");
+		List<String> apList = bm2.getFullColValues(apRc);
+		bm1.appendCol(apList);
+
+		apRc = bm2.getKeyByValue("0560-EMRL");
+		apList = bm2.getFullColValues(apRc);
+		bm1.appendCol(apList);
+
+//		System.out.println("bm2:"+obm.writeValueAsString(bm2)); 
+
+		bm1.saveCSV();
 
 	}
 
